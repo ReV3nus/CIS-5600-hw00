@@ -24,7 +24,7 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
-          npm ci
+          npm install --legacy-peer-deps
           export NODE_ENV=production
           npm run-script build
           touch dist/.nojekyll
