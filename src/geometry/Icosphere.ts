@@ -172,7 +172,17 @@ class Icosphere extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-    console.log(`Created icosphere with ${vertices.length} vertices`);
+    // console.log(`Created icosphere with ${vertices.length} vertices`);
+    // for(let i = 0; i < vertices.length; i++)
+    // {
+    //   console.log("i = "+ i + 
+    //     ", pos = " + new Float32Array(this.buffer, positionByteOffset + i * 4 * Float32Array.BYTES_PER_ELEMENT, 3) + 
+    //   ", nor = " + new Float32Array(this.buffer, normalByteOffset + i * 4 * Float32Array.BYTES_PER_ELEMENT, 3));
+    // }
+    // for(let i =0; i < this.indices.length;i++)
+    // {
+    //   console.log("i = " + i + " " + this.indices[i])
+    // }
   }
 };
 

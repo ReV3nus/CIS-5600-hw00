@@ -26,16 +26,44 @@ in vec4 vs_Nor;             // The array of vertex normals passed to the shader
 in vec4 vs_Col;             // The array of vertex colors passed to the shader.
 
 out vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.
-out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.
-out vec4 fs_Pos;
 
-const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of
-                                        //the geometry in the fragment shader.
+// magma params
+out vec4 fs_wPos;
+out vec4 fs_mPos;
 
+uniform float u_Time;
+uniform float u_CubeSize;
+
+uniform float u_WaveSpeed;
+uniform float u_WaveAmpl;
+
+float rdm(vec3 p)
+{
+    float res = p.x + p.y + p.z;
+    return res;
+}
 void main()
 {
     fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
+
+
+    // Surface Displacement
+    fs_mPos = vs_Pos;
+    float halfSize = u_CubeSize / 2.0;
+    vec3 dir = vec3(int(abs(fs_mPos.x) == halfSize),
+                    int(abs(fs_mPos.y) == halfSize), 
+                    int(abs(fs_mPos.z) == halfSize));
+
+    if(length(dir) < 1.5)
+    {
+        float disp = halfSize * u_WaveAmpl * sin(u_Time * u_WaveSpeed + rdm(vec3(fs_mPos)));
+        fs_mPos.xyz += disp * dir;
+        if(disp < 0. && length(dir) > 1.)
+        {
+            fs_mPos.xyz -= disp * dir;
+        }
+    }
 
     mat3 invTranspose = mat3(u_ModelInvTr);
     fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.
@@ -44,13 +72,9 @@ void main()
                                                             // perpendicular to the surface after the surface is transformed by
                                                             // the model matrix.
 
+    fs_wPos = u_Model * fs_mPos;
+    
 
-    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
+    gl_Position = u_ViewProj * fs_mPos;
 
-    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
-
-    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
-                                             // used to render the final positions of the geometry's vertices
-
-    fs_Pos = vs_Pos;
 }
